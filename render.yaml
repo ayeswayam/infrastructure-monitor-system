@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: ai-infra-monitoring
+    env: python
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && gunicorn --bind 0.0.0.0:$PORT app:create_app()"
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SLACK_WEBHOOK
+        sync: false
+
+databases:
+  - name: monitor-db
+    databaseName: monitor_db
+    user: monitor
