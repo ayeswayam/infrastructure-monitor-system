@@ -12,15 +12,20 @@ def create_app():
     jwt = JWTManager(app)
     init_db(app)
     app.register_blueprint(api_bp, url_prefix='/api/v1')
+
     @app.route('/health')
     def health():
         return jsonify({'status':'ok'})
+
     # serve frontend index
     @app.route('/')
     def index():
         return app.send_static_file('index.html')
+
     return app
 
+# Create top-level app for Gunicorn
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
     app.run(host='0.0.0.0', port=5000)
