@@ -2,5 +2,5 @@
 [project]
 name = "ai-infrastructure-monitoring"
 [services.backend]
-start = "gunicorn --bind 0.0.0.0:$PORT app:app"
 python_version = "3.12"
+start = "gunicorn --bind 0.0.0.0:$PORT app:create_app()"
