@@ -5,7 +5,6 @@ from api.routes import api_bp
 from config import Config
 from flask_jwt_extended import JWTManager
 import os
-import time
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -17,31 +16,35 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 # Initialize JWT
 jwt = JWTManager(app)
 
-# Initialize database with retry logic
-def init_database():
-    max_retries = 5
-    for i in range(max_retries):
-        try:
-            db.init_app(app)
-            with app.app_context():
-                db.create_all()
-                print("Database connected successfully")
-            return True
-        except Exception as e:
-            print(f"Database connection attempt {i+1} failed: {e}")
-            if i < max_retries - 1:
-                time.sleep(5)
-    return False
+# Initialize database (only once, no retry logic needed)
+db.init_app(app)
 
-# Initialize database
-init_database()
+# Create tables within app context
+with app.app_context():
+    try:
+        db.create_all()
+        print("✓ Database tables created successfully")
+    except Exception as e:
+        print(f"⚠ Database initialization warning: {e}")
+        # Don't fail - let Railway health check handle it
 
 # Register API routes
 app.register_blueprint(api_bp, url_prefix='/api/v1')
 
 @app.route('/health')
 def health():
-    return jsonify({'status': 'healthy'})
+    try:
+        # Test database connection
+        db.session.execute(db.text('SELECT 1'))
+        db_status = 'connected'
+    except Exception as e:
+        db_status = f'error: {str(e)[:50]}'
+    
+    return jsonify({
+        'status': 'healthy',
+        'database': db_status,
+        'port': os.getenv('PORT', '5000')
+    })
 
 @app.route('/')
 def index():
@@ -57,4 +60,5 @@ def index():
     })
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
