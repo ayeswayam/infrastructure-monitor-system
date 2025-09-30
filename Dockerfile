@@ -22,5 +22,5 @@ ENV FLASK_APP=app.py
 # Expose port (Railway will set $PORT)
 EXPOSE 5000
 
-# Start command
-CMD gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 app:app
+# Start command - use shell form to ensure $PORT is expanded
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 app:app"]
