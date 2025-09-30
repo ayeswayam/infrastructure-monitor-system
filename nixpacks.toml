@@ -1,11 +1,10 @@
 [phases.setup]
-nixPkgs = ["python311", "postgresql", "pip"]
+nixPkgs = ["python311", "postgresql"]
 
 [phases.install]
 cmds = [
-  "cd backend",
-  "python3 -m pip install --upgrade pip",
-  "python3 -m pip install -r requirements.txt"
+  "python3 -m pip install --upgrade pip setuptools wheel",
+  "cd backend && python3 -m pip install -r requirements.txt"
 ]
 
 [start]
