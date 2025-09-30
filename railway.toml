@@ -3,10 +3,10 @@
 name = "ai-infrastructure-monitoring"
 [build]
 builder = "nixpacks"
-buildCommand = "cd backend && pip install -r requirements.txt"
+nixpacksConfigPath = "nixpacks.toml"
 
 [deploy]
-startCommand = "cd backend && gunicorn --bind 0.0.0.0:$PORT app:app"
+startCommand = "cd backend && python3 -m gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 app:app"
 healthcheckPath = "/health"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
